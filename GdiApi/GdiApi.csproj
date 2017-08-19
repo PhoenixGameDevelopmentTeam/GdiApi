@@ -49,6 +49,7 @@
     <Compile Include="ContextForm.Designer.cs">
       <DependentUpon>ContextForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="BitmapBuffer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
