@@ -16,7 +16,9 @@ namespace GdiApi
 
         public DateTime LastFrameRender { get; private set; }
 
-        public Context(Size size)
+        public Context() : this(new Size(500, 500)) { }
+        public Context(Size size) : this(size, "GdiApi Context") {  }
+        public Context(Size size, string title)
         {
             Form = new ContextForm();
             Form.Show();

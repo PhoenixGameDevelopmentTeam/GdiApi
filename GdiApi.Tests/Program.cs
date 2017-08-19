@@ -15,7 +15,7 @@ namespace GdiApi.Tests
 
     public class Game : Context
     {
-        public Game() : base(new Size(1000, 1000))
+        public Game() : base(new Size(1000, 1000), "a")
         {
 
         }
