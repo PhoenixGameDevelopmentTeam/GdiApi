@@ -9,7 +9,7 @@ namespace GdiApi
 
     public class Context
     {
-        private Form Form;
+        private ContextForm Form;
 
         public event RenderEventHandler RenderEvent;
         public event UpdateEventHandler UpdateEvent;
@@ -18,9 +18,11 @@ namespace GdiApi
 
         public Context(Size size)
         {
-            Form = new Form();
+            Form = new ContextForm();
+            Form.Show();
+
+            Form.ClientSize = size;
             Form.Paint += Paint;
-            Form.Size = size;
         }
 
         private void Paint(object sender, PaintEventArgs e)

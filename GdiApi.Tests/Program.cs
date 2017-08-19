@@ -10,14 +10,12 @@ namespace GdiApi.Tests
         static void Main(string[] args)
         {
             var g = new Game();
-
-            Console.Read();
         }
     }
 
     public class Game : Context
     {
-        public Game() : base(new Size(500, 500))
+        public Game() : base(new Size(1000, 1000))
         {
 
         }
