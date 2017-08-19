@@ -1,21 +1,21 @@
 ﻿using System;
 
-namespace GdiApi.Tests
+namespace GdiApi
 {
     public class FrameRateManager
     {
         public int frameCntThisSpan = 0;
         public int FrameRate = 0;
-        public int MarksPerSecond = 3;
+        public int UpdatesPerSecond = 3;
         public TimeSpan span = new TimeSpan();
 
         public void Frame(TimeSpan delta)
         {
             span += delta;
             frameCntThisSpan++;
-            if (span.TotalMilliseconds >= 1000 / MarksPerSecond)
+            if (span.TotalMilliseconds >= 1000 / UpdatesPerSecond)
             {
-                FrameRate = frameCntThisSpan * MarksPerSecond;
+                FrameRate = frameCntThisSpan * UpdatesPerSecond;
                 frameCntThisSpan = 0;
                 span = TimeSpan.Zero;
             }

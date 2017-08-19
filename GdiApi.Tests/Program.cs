@@ -21,9 +21,16 @@ namespace GdiApi.Tests
         public Game()
         {
             context = new Context(new Size(1000, 1000), "Fun Time!", true);
+
             context.Load += Load;
             context.Render += Render;
+            context.KeyDown += Context_KeyDown;
             context.Begin();
+        }
+
+        private void Context_KeyDown(KeyEventArgs kea)
+        {
+
         }
 
         public void Load()
@@ -35,11 +42,6 @@ namespace GdiApi.Tests
         public void Render(Graphics graphics, TimeSpan delta)
         {
             frameRate.Frame(delta);
-
-            if (BitmapBuffer.Ready)
-            {
-                graphics.DrawBitmap(0, new Rectangle(0, 0, 1000, 1000));
-            }
 
             context.Title = "Framerate: " + frameRate.ToString();
         }

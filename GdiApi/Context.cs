@@ -16,7 +16,7 @@ namespace GdiApi
 
     public class Context
     {
-        public ContextForm Form;
+        private ContextForm Form;
 
         public event RenderEventHandler Render;
         public event UpdateEventHandler Update;
@@ -37,6 +37,9 @@ namespace GdiApi
         }
         public Brush ClearBrush { get; set; } = new SolidBrush(Color.White);
         public DateTime LastFrameRender { get; private set; }
+        public Point MouseLocation { get; private set; }
+        public Size Size => Form.Size;
+        public bool MouseClicked { get; private set; }
 
         public Context() : this(new Size(500, 500)) { }
         public Context(Size size) : this(size, "GdiApi Context") {  }
@@ -83,10 +86,22 @@ namespace GdiApi
         private void Form_KeyUp(object sender, KeyEventArgs e) => KeyUp?.Invoke(e);
         private void Form_KeyDown(object sender, KeyEventArgs e) => KeyDown?.Invoke(e);
         private void Form_KeyPress(object sender, KeyPressEventArgs e) => KeyPress?.Invoke(e);
-        private void Form_MouseUp(object sender, MouseEventArgs e) => MouseUp?.Invoke(e);
-        private void Form_MouseDown(object sender, MouseEventArgs e) => MouseDown?.Invoke(e);
+        private void Form_MouseUp(object sender, MouseEventArgs e)
+        {
+            MouseUp?.Invoke(e);
+            MouseClicked = false;
+        }
+        private void Form_MouseDown(object sender, MouseEventArgs e)
+        {
+            MouseDown?.Invoke(e);
+            MouseClicked = true;
+        }
         private void Form_MouseClick(object sender, MouseEventArgs e) => MouseClick?.Invoke(e);
-        private void Form_MouseMove(object sender, MouseEventArgs e) => MouseMove?.Invoke(e);
+        private void Form_MouseMove(object sender, MouseEventArgs e)
+        {
+            MouseMove?.Invoke(e);
+            MouseLocation = e.Location;
+        }
         private void Form_Load(object sender, EventArgs e) => Load?.Invoke();
         private void Paint(object sender, PaintEventArgs e)
         {

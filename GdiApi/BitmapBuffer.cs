@@ -31,6 +31,12 @@ namespace GdiApi
         }
 
         public static Bitmap FromIndex(int index) => memory[index];
-        public static void DrawBitmap(this Graphics g, int index, Rectangle r) => g.DrawImage(FromIndex(index), r);
+        public static void DrawBitmap(this Graphics g, int index, Rectangle r)
+        {
+            if (BitmapBuffer.Ready)
+            {
+                g.DrawImage(FromIndex(index), r);
+            }
+        }
     }
 }
