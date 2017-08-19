@@ -9,14 +9,26 @@ namespace GdiApi
     public delegate void RenderEventHandler(Graphics graphics, TimeSpan delta);
     public delegate void UpdateEventHandler(Graphics graphics, TimeSpan delta);
     public delegate void LoadEventHandler();
+    public delegate void MouseEventHandler(MouseEventArgs mea);
+    public delegate void KeyPressEventHandler(KeyPressEventArgs kpea);
+    public delegate void KeyEventHandler(KeyEventArgs kea);
+    public delegate void ClosingEventHandler(FormClosingEventArgs fcea);
 
     public class Context
     {
-        private ContextForm Form;
+        public ContextForm Form;
 
-        public event RenderEventHandler RenderEvent;
-        public event UpdateEventHandler UpdateEvent;
-        public event LoadEventHandler LoadEvent;
+        public event RenderEventHandler Render;
+        public event UpdateEventHandler Update;
+        public event LoadEventHandler Load;
+        public event MouseEventHandler MouseMove;
+        public event MouseEventHandler MouseDown;
+        public event MouseEventHandler MouseUp;
+        public event MouseEventHandler MouseClick;
+        public event KeyPressEventHandler KeyPress;
+        public event KeyEventHandler KeyDown;
+        public event KeyEventHandler KeyUp;
+        public event ClosingEventHandler Closing;
 
         public object Title
         {
@@ -29,12 +41,14 @@ namespace GdiApi
         public Context() : this(new Size(500, 500)) { }
         public Context(Size size) : this(size, "GdiApi Context") {  }
         public Context(Size size, string title) : this (size, title, true) {  }
-        public Context(Size size, string title, bool center)
+        public Context(Size size, string title, bool center) : this(size, title, center, FormBorderStyle.Sizable) {  }
+        public Context(Size size, string title, bool center, FormBorderStyle border)
         {
             Form = new ContextForm()
             {
                 ClientSize = size,
                 Text = title,
+                FormBorderStyle = border,
             };
 
             if (center)
@@ -52,13 +66,28 @@ namespace GdiApi
             aProp.SetValue(Form, true, null);
 
             Form.Paint += Paint;
-            Form.Load += Load;
-
-            Form.ShowDialog();
+            Form.Load += Form_Load;
+            Form.MouseMove += Form_MouseMove;
+            Form.MouseClick += Form_MouseClick;
+            Form.MouseDown += Form_MouseDown;
+            Form.MouseUp += Form_MouseUp;
+            Form.KeyPress += Form_KeyPress;
+            Form.KeyDown += Form_KeyDown;
+            Form.KeyUp += Form_KeyUp;
+            Form.FormClosing += Form_FormClosing;
         }
 
-        private void Load(object sender, EventArgs e) => LoadEvent?.Invoke();
+        public void Begin() => Form.ShowDialog();
 
+        private void Form_FormClosing(object sender, FormClosingEventArgs e) => Closing?.Invoke(e);
+        private void Form_KeyUp(object sender, KeyEventArgs e) => KeyUp?.Invoke(e);
+        private void Form_KeyDown(object sender, KeyEventArgs e) => KeyDown?.Invoke(e);
+        private void Form_KeyPress(object sender, KeyPressEventArgs e) => KeyPress?.Invoke(e);
+        private void Form_MouseUp(object sender, MouseEventArgs e) => MouseUp?.Invoke(e);
+        private void Form_MouseDown(object sender, MouseEventArgs e) => MouseDown?.Invoke(e);
+        private void Form_MouseClick(object sender, MouseEventArgs e) => MouseClick?.Invoke(e);
+        private void Form_MouseMove(object sender, MouseEventArgs e) => MouseMove?.Invoke(e);
+        private void Form_Load(object sender, EventArgs e) => Load?.Invoke();
         private void Paint(object sender, PaintEventArgs e)
         {
             //No anti aliasing
@@ -70,13 +99,13 @@ namespace GdiApi
             var delta = DateTime.Now - LastFrameRender;
             
             //Update
-            UpdateEvent?.Invoke(e.Graphics, delta);
+            Update?.Invoke(e.Graphics, delta);
 
             //Clear screen
             e.Graphics.FillRectangle(ClearBrush, new Rectangle(0, 0, Form.ClientSize.Width, Form.ClientSize.Height));
             
             //Render
-            RenderEvent?.Invoke(e.Graphics, delta);
+            Render?.Invoke(e.Graphics, delta);
 
             //End frame
             LastFrameRender = DateTime.Now;

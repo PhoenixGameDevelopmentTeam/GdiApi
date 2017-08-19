@@ -23,9 +23,10 @@ namespace GdiApi.Tests
 
         public Game()
         {
-            context.LoadEvent += Load;
-            context.RenderEvent += Render;
             context = new Context(new Size(1000, 1000), "Fun Time!", true);
+            context.Load += Load;
+            context.Render += Render;
+            context.Begin();
         }
 
         public void Load()
