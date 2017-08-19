@@ -57,57 +57,30 @@ namespace GdiApi
             Form.ShowDialog();
         }
 
-        private void Load(object sender, EventArgs e)
-        {
-            LoadEvent?.Invoke();
-            Load();
-        }
+        private void Load(object sender, EventArgs e) => LoadEvent?.Invoke();
 
         private void Paint(object sender, PaintEventArgs e)
         {
+            //No anti aliasing
             e.Graphics.SmoothingMode = SmoothingMode.None;
             e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
             e.Graphics.PixelOffsetMode = PixelOffsetMode.None;
-            var delta = DateTime.Now - LastFrameRender;
 
-            Update(e.Graphics, delta);
+            //Get delta
+            var delta = DateTime.Now - LastFrameRender;
+            
+            //Update
             UpdateEvent?.Invoke(e.Graphics, delta);
 
+            //Clear screen
             e.Graphics.FillRectangle(ClearBrush, new Rectangle(0, 0, Form.ClientSize.Width, Form.ClientSize.Height));
-
-            Render(e.Graphics, delta);
+            
+            //Render
             RenderEvent?.Invoke(e.Graphics, delta);
 
+            //End frame
             LastFrameRender = DateTime.Now;
             Form.Invalidate();
-        }
-
-        /// <summary>
-        /// When the context loads. No need to call base.
-        /// </summary>
-        public virtual void Load()
-        {
-
-        }
-
-        /// <summary>
-        /// Called every frame render, before Context.Render. No need to call base.
-        /// </summary>
-        /// <param name="graphics"></param>
-        /// <param name="delta"></param>
-        public virtual void Update(Graphics graphics, TimeSpan delta)
-        {
-
-        }
-
-        /// <summary>
-        /// Called every frame render, after Context.Update. No need to call base.
-        /// </summary>
-        /// <param name="graphics"></param>
-        /// <param name="delta"></param>
-        public virtual void Render(Graphics graphics, TimeSpan delta)
-        {
-
         }
     }
 }

@@ -13,24 +13,28 @@ namespace GdiApi.Tests
         }
     }
 
-    public class Game : Context
+    public class Game
     {
         public int frameCntThisSecond = 0;
         public int frameRate = 0;
         public TimeSpan second = new TimeSpan();
 
-        public Game() : base(new Size(1000, 1000), "Fun Time!", true)
-        {
+        Context context;
 
+        public Game()
+        {
+            context.LoadEvent += Load;
+            context.RenderEvent += Render;
+            context = new Context(new Size(1000, 1000), "Fun Time!", true);
         }
 
-        public override void Load()
+        public void Load()
         {
             BitmapBuffer.Clear();
             BitmapBuffer.Load(@"assets\");
         }
 
-        public override void Render(Graphics graphics, TimeSpan delta)
+        public void Render(Graphics graphics, TimeSpan delta)
         {
             second += delta;
             if (second.TotalMilliseconds >= 1000)
@@ -47,7 +51,7 @@ namespace GdiApi.Tests
 
             frameCntThisSecond++;
 
-            Title = frameRate.ToString() + " | Ready: " + BitmapBuffer.Ready;
+            context.Title = frameRate.ToString() + " | Ready: " + BitmapBuffer.Ready;
         }
     }
 }
