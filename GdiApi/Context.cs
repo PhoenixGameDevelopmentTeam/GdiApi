@@ -8,7 +8,7 @@ namespace GdiApi
 {
     public delegate void RenderEventHandler(Graphics graphics, TimeSpan delta);
     public delegate void UpdateEventHandler(Graphics graphics, TimeSpan delta);
-    public delegate void LoadEventHandler();
+    public delegate void EventHandler();
     public delegate void MouseEventHandler(MouseEventArgs mea);
     public delegate void KeyPressEventHandler(KeyPressEventArgs kpea);
     public delegate void KeyEventHandler(KeyEventArgs kea);
@@ -20,7 +20,7 @@ namespace GdiApi
 
         public event RenderEventHandler Render;
         public event UpdateEventHandler Update;
-        public event LoadEventHandler Load;
+        public event EventHandler Load;
         public event MouseEventHandler MouseMove;
         public event MouseEventHandler MouseDown;
         public event MouseEventHandler MouseUp;
@@ -29,6 +29,7 @@ namespace GdiApi
         public event KeyEventHandler KeyDown;
         public event KeyEventHandler KeyUp;
         public event ClosingEventHandler Closing;
+        public event EventHandler Resize;
 
         public object Title
         {
@@ -41,6 +42,8 @@ namespace GdiApi
         public Size Size => Form.Size;
         public bool MouseClicked { get; private set; }
         public ControlCollection Controls => Form.Controls;
+        public bool ClearScreen { get; set; } = true;
+        public bool ManageFrameDraw { get; set; } = true;
 
         public Context() : this(new Size(500, 500)) { }
         public Context(Size size) : this(size, "GdiApi Context") {  }
@@ -79,6 +82,7 @@ namespace GdiApi
             Form.KeyDown += Form_KeyDown;
             Form.KeyUp += Form_KeyUp;
             Form.FormClosing += Form_FormClosing;
+            Form.Resize += Form_Resize;
         }
 
         public void Begin(bool async)
@@ -93,6 +97,7 @@ namespace GdiApi
             }
         }
 
+        private void Form_Resize(object sender, EventArgs e) => Resize?.Invoke();
         private void Form_FormClosing(object sender, FormClosingEventArgs e) => Closing?.Invoke(e);
         private void Form_KeyUp(object sender, KeyEventArgs e) => KeyUp?.Invoke(e);
         private void Form_KeyDown(object sender, KeyEventArgs e) => KeyDown?.Invoke(e);
@@ -116,26 +121,32 @@ namespace GdiApi
         private void Form_Load(object sender, EventArgs e) => Load?.Invoke();
         private void Paint(object sender, PaintEventArgs e)
         {
-            //No anti aliasing
-            e.Graphics.SmoothingMode = SmoothingMode.None;
-            e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-            e.Graphics.PixelOffsetMode = PixelOffsetMode.None;
+            if (ManageFrameDraw)
+            {
+                //No anti aliasing
+                e.Graphics.SmoothingMode = SmoothingMode.None;
+                e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+                e.Graphics.PixelOffsetMode = PixelOffsetMode.None;
 
-            //Get delta
-            var delta = DateTime.Now - LastFrameRender;
-            
-            //Update
-            Update?.Invoke(e.Graphics, delta);
+                //Get delta
+                var delta = DateTime.Now - LastFrameRender;
 
-            //Clear screen
-            e.Graphics.FillRectangle(ClearBrush, new Rectangle(0, 0, Form.ClientSize.Width, Form.ClientSize.Height));
-            
-            //Render
-            Render?.Invoke(e.Graphics, delta);
+                //Update
+                Update?.Invoke(e.Graphics, delta);
 
-            //End frame
-            LastFrameRender = DateTime.Now;
-            Form.Invalidate();
+                //Clear screen
+                if (ClearScreen)
+                {
+                    e.Graphics.FillRectangle(ClearBrush, new Rectangle(0, 0, Form.ClientSize.Width, Form.ClientSize.Height));
+                }
+
+                //Render
+                Render?.Invoke(e.Graphics, delta);
+
+                //End frame
+                LastFrameRender = DateTime.Now;
+                Form.Invalidate();
+            }
         }
     }
 }
