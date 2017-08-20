@@ -12,7 +12,7 @@ namespace GdiApi
     public delegate void MouseEventHandler(MouseEventArgs mea);
     public delegate void KeyPressEventHandler(KeyPressEventArgs kpea);
     public delegate void KeyEventHandler(KeyEventArgs kea);
-    public delegate void ClosingEventHandler(FormClosingEventArgs fcea);
+    public delegate FormClosingEventArgs ClosingEventHandler(FormClosingEventArgs fcea);
 
     public class Context
     {
@@ -44,6 +44,7 @@ namespace GdiApi
         public ControlCollection Controls => Form.Controls;
         public bool ClearScreen { get; set; } = true;
         public bool ManageFrameDraw { get; set; } = true;
+        private bool SelfExiting { get; set; } = false;
 
         public Context() : this(new Size(500, 500)) { }
         public Context(Size size) : this(size, "GdiApi Context") {  }
@@ -98,8 +99,19 @@ namespace GdiApi
             }
         }
 
+        public void Exit() => Form.Close();
+
         private void Form_Resize(object sender, EventArgs e) => Resize?.Invoke();
-        private void Form_FormClosing(object sender, FormClosingEventArgs e) => Closing?.Invoke(e);
+        private void Form_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            ManageFrameDraw = false;
+            var f = Closing?.Invoke(e);
+            if (f.Cancel)
+            {
+                ManageFrameDraw = true;
+            }
+        }
+
         private void Form_KeyUp(object sender, KeyEventArgs e) => KeyUp?.Invoke(e);
         private void Form_KeyDown(object sender, KeyEventArgs e) => KeyDown?.Invoke(e);
         private void Form_KeyPress(object sender, KeyPressEventArgs e) => KeyPress?.Invoke(e);
