@@ -56,6 +56,7 @@ namespace GdiApi
                 ClientSize = size,
                 Text = title,
                 FormBorderStyle = border,
+                KeyPreview = true,
             };
 
             if (center)
