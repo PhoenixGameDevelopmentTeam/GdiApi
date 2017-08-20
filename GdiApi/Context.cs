@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
+using static System.Windows.Forms.Control;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
@@ -40,6 +40,7 @@ namespace GdiApi
         public Point MouseLocation { get; private set; }
         public Size Size => Form.Size;
         public bool MouseClicked { get; private set; }
+        public ControlCollection Controls => Form.Controls;
 
         public Context() : this(new Size(500, 500)) { }
         public Context(Size size) : this(size, "GdiApi Context") {  }
@@ -80,7 +81,17 @@ namespace GdiApi
             Form.FormClosing += Form_FormClosing;
         }
 
-        public void Begin() => Form.ShowDialog();
+        public void Begin(bool async)
+        {
+            if (async)
+            {
+                Form.Show();
+            }
+            else
+            {
+                Form.ShowDialog();
+            }
+        }
 
         private void Form_FormClosing(object sender, FormClosingEventArgs e) => Closing?.Invoke(e);
         private void Form_KeyUp(object sender, KeyEventArgs e) => KeyUp?.Invoke(e);

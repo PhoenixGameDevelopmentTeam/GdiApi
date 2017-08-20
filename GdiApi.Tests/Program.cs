@@ -25,7 +25,7 @@ namespace GdiApi.Tests
             context.Load += Load;
             context.Render += Render;
             context.KeyDown += Context_KeyDown;
-            context.Begin();
+            context.Begin(false);
         }
 
         private void Context_KeyDown(KeyEventArgs kea)
