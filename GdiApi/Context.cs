@@ -106,7 +106,7 @@ namespace GdiApi
         {
             ManageFrameDraw = false;
             var f = Closing?.Invoke(e);
-            if (f.Cancel)
+            if (f != null && f.Cancel)
             {
                 ManageFrameDraw = true;
             }
